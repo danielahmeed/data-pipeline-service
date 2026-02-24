@@ -20,4 +20,6 @@ public class FieldMapping implements Serializable {
   private String dataType; // STRING, DECIMAL, DATE, etc.
   private boolean required; // Is this field mandatory?
   private String transformFunction; // Optional transformation logic
+  private String transformRule; // Transformation rule (uppercase, lowercase, normalize_mobile, etc.)
+  private Object defaultValue; // Default value if field is missing
 }

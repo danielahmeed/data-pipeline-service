@@ -1,7 +1,6 @@
 package com.mypolicy.pipeline.processing.service;
 
 import com.mypolicy.pipeline.metadata.model.FieldMapping;
-import com.mypolicy.pipeline.metadata.model.InsurerConfiguration;
 import com.mypolicy.pipeline.metadata.service.MetadataService;
 import com.mypolicy.pipeline.ingestion.service.IngestionService;
 import com.mypolicy.pipeline.ingestion.dto.StatusUpdateRequest;
@@ -22,7 +21,8 @@ import java.util.*;
  * Processing Service: Excel/CSV parsing, field mapping, data transformation.
  * 
  * Consolidated Service: Part of data-pipeline-service.
- * OPTIMIZATION: Direct method calls to MetadataService and MatchingService (no HTTP overhead).
+ * OPTIMIZATION: Direct method calls to MetadataService and MatchingService (no
+ * HTTP overhead).
  */
 @Service
 @RequiredArgsConstructor
@@ -30,17 +30,18 @@ public class ProcessingService {
 
   private static final Logger log = LoggerFactory.getLogger(ProcessingService.class);
 
-  private final MetadataService metadataService;    // Direct injection - no HTTP!
-  private final IngestionService ingestionService;  // Direct injection - no HTTP!
-  private final MatchingService matchingService;    // Direct injection - no HTTP!
+  private final MetadataService metadataService; // Direct injection - no HTTP!
+  private final IngestionService ingestionService; // Direct injection - no HTTP!
+  private final MatchingService matchingService; // Direct injection - no HTTP!
 
   /**
    * Process uploaded file: parse Excel/CSV, apply mappings, transform data.
    * 
-   * Consolidation Benefit: Metadata lookup is now a method call (< 1ms) instead of HTTP (~50ms).
+   * Consolidation Benefit: Metadata lookup is now a method call (< 1ms) instead
+   * of HTTP (~50ms).
    */
   public void processFile(String jobId, String filePath, String insurerId, String policyType) {
-    log.info("[Processing] Starting file processing: jobId={}, insurerId={}, policyType={}", 
+    log.info("[Processing] Starting file processing: jobId={}, insurerId={}, policyType={}",
         jobId, insurerId, policyType);
 
     try {
@@ -51,7 +52,6 @@ public class ProcessingService {
 
       // 1. Fetch Mapping Rules (DIRECT METHOD CALL - no HTTP!)
       log.debug("[Processing] Fetching metadata configuration for insurerId={}", insurerId);
-      InsurerConfiguration config = metadataService.getConfiguration(insurerId);
       List<FieldMapping> mappings = metadataService.getMappingsForPolicyType(insurerId, policyType);
 
       if (mappings == null || mappings.isEmpty()) {
@@ -95,7 +95,7 @@ public class ProcessingService {
               Object cellValue = getCellValue(cell);
               standardRecord.put(mapping.getTargetField(), cellValue);
             } else if (mapping.isRequired()) {
-              log.warn("[Processing] Required field '{}' not found in Excel headers", 
+              log.warn("[Processing] Required field '{}' not found in Excel headers",
                   mapping.getSourceField());
             }
           }
@@ -128,25 +128,25 @@ public class ProcessingService {
 
       } catch (IOException e) {
         log.error("[Processing] Error processing file: jobId={}", jobId, e);
-        
+
         // Update job status to FAILED
         StatusUpdateRequest failedUpdate = new StatusUpdateRequest();
         failedUpdate.setStatus(IngestionStatus.FAILED);
         failedUpdate.setFailureReason("File processing failed: " + e.getMessage());
         ingestionService.updateStatus(jobId, failedUpdate);
-        
+
         throw new RuntimeException("Error processing file", e);
       }
 
     } catch (Exception e) {
       log.error("[Processing] Processing failed for jobId={}", jobId, e);
-      
+
       // Update job status to FAILED
       StatusUpdateRequest failedUpdate = new StatusUpdateRequest();
       failedUpdate.setStatus(IngestionStatus.FAILED);
       failedUpdate.setFailureReason(e.getMessage());
       ingestionService.updateStatus(jobId, failedUpdate);
-      
+
       throw new RuntimeException("Processing failed", e);
     }
   }
