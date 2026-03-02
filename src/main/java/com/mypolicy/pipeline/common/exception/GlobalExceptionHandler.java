@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -20,80 +21,78 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+  private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    /**
-     * Handle validation errors from request body
-     */
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationExceptions(
-            MethodArgumentNotValidException ex) {
+  /**
+   * Handle validation errors from request body
+   */
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationExceptions(
+      MethodArgumentNotValidException ex) {
 
-        Map<String, String> errors = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .collect(Collectors.toMap(
-                        FieldError::getField,
-                        error -> error.getDefaultMessage() != null ? error.getDefaultMessage() : "Invalid value",
-                        (existing, replacement) -> existing));
+    Map<String, String> errors = ex.getBindingResult()
+        .getFieldErrors()
+        .stream()
+        .collect(Collectors.toMap(
+            FieldError::getField,
+            error -> error.getDefaultMessage() != null ? error.getDefaultMessage() : "Invalid value",
+            (existing, replacement) -> existing));
 
-        log.warn("Validation failed: {}", errors);
+    log.warn("Validation failed: {}", errors);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.<Map<String, String>>builder()
-                        .success(false)
-                        .message("Validation failed")
-                        .data(errors)
-                        .error(ApiResponse.ErrorDetails.builder()
-                                .code("VALIDATION_ERROR")
-                                .message("One or more fields have validation errors")
-                                .build())
-                        .build());
-    }
+    ApiResponse<Map<String, String>> resp = new ApiResponse<>();
+    resp.setSuccess(false);
+    resp.setMessage("Validation failed");
+    resp.setData(errors);
+    ApiResponse.ErrorDetails err = new ApiResponse.ErrorDetails("VALIDATION_ERROR", "One or more fields have validation errors", null);
+    resp.setError(err);
+    resp.setTimestamp(java.time.LocalDateTime.now());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resp);
+  }
 
-    /**
-     * Handle IllegalArgumentException (typically validation errors)
-     */
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiResponse<Void>> handleIllegalArgumentException(IllegalArgumentException ex) {
-        log.warn("Invalid argument: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.error(ex.getMessage(), "INVALID_ARGUMENT"));
-    }
+  /**
+   * Handle IllegalArgumentException (typically validation errors)
+   */
+  @ExceptionHandler(IllegalArgumentException.class)
+  public ResponseEntity<ApiResponse<Void>> handleIllegalArgumentException(IllegalArgumentException ex) {
+    log.warn("Invalid argument: {}", ex.getMessage());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+        .body(ApiResponse.error(ex.getMessage(), "INVALID_ARGUMENT"));
+  }
 
-    /**
-     * Handle IllegalStateException (typically state transition errors)
-     */
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<ApiResponse<Void>> handleIllegalStateException(IllegalStateException ex) {
-        log.warn("Invalid state: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ApiResponse.error(ex.getMessage(), "INVALID_STATE"));
-    }
+  /**
+   * Handle IllegalStateException (typically state transition errors)
+   */
+  @ExceptionHandler(IllegalStateException.class)
+  public ResponseEntity<ApiResponse<Void>> handleIllegalStateException(IllegalStateException ex) {
+    log.warn("Invalid state: {}", ex.getMessage());
+    return ResponseEntity.status(HttpStatus.CONFLICT)
+        .body(ApiResponse.error(ex.getMessage(), "INVALID_STATE"));
+  }
 
-    /**
-     * Handle generic runtime exceptions
-     */
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException ex) {
-        log.error("Runtime exception occurred", ex);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error(
-                        "An unexpected error occurred",
-                        "INTERNAL_ERROR",
-                        ex.getMessage()));
-    }
+  /**
+   * Handle generic runtime exceptions
+   */
+  @ExceptionHandler(RuntimeException.class)
+  public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException ex) {
+    log.error("Runtime exception occurred", ex);
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(ApiResponse.error(
+            "An unexpected error occurred",
+            "INTERNAL_ERROR",
+            ex.getMessage()));
+  }
 
-    /**
-     * Handle all other exceptions
-     */
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleGenericException(Exception ex) {
-        log.error("Unexpected exception occurred", ex);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error(
-                        "An unexpected error occurred",
-                        "INTERNAL_ERROR",
-                        ex.getMessage()));
-    }
+  /**
+   * Handle all other exceptions
+   */
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<ApiResponse<Void>> handleGenericException(Exception ex) {
+    log.error("Unexpected exception occurred", ex);
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        .body(ApiResponse.error(
+            "An unexpected error occurred",
+            "INTERNAL_ERROR",
+            ex.getMessage()));
+  }
 }

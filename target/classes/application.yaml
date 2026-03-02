@@ -37,11 +37,6 @@ spring:
   # ========================================
   # MongoDB Configuration (Ingestion Module)
   # ========================================
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
-      - org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration
-
   data:
     mongodb:
       uri: mongodb://localhost:27017/ingestion_db
@@ -59,6 +54,13 @@ spring:
 # File storage
 file:
   upload-dir: ./uploads
+
+# Ingestion module
+ingestion:
+  storage:
+    path: storage/ingestion
+  schema:
+    validate: true
 
 # ========================================
 # Feign Client Configuration (Matching Module)

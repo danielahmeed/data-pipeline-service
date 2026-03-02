@@ -55,6 +55,13 @@ spring:
 file:
   upload-dir: ./uploads
 
+# Ingestion module
+ingestion:
+  storage:
+    path: storage/ingestion
+  schema:
+    validate: true
+
 # ========================================
 # Feign Client Configuration (Matching Module)
 # ========================================

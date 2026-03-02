@@ -40,7 +40,7 @@ public class ProcessingController {
     IngestionJob job = ingestionService.getJob(jobId);
 
     processingService.processFile(jobId, job.getFilePath(), job.getInsurerId(), policyType);
-    
+
     return ResponseEntity.ok("Processing started for jobId: " + jobId);
   }
 

@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Data Pipeline Service - Consolidated Service
@@ -28,11 +27,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableFeignClients(basePackages = "com.mypolicy.pipeline.matching.client")
 @EnableJpaRepositories(basePackages = "com.mypolicy.pipeline.metadata.repository")
-@EnableMongoRepositories(basePackages = {
-    "com.mypolicy.pipeline.ingestion.repository",
-    "com.mypolicy.pipeline.common.audit"
-})
-@EnableScheduling
+@EnableMongoRepositories(basePackages = "com.mypolicy.pipeline.ingestion.repository")
 public class DataPipelineApplication {
 
   public static void main(String[] args) {

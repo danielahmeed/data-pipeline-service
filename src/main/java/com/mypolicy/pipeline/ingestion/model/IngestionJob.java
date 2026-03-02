@@ -5,6 +5,9 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Ingestion job document - tracks file upload and processing lifecycle.
@@ -20,6 +23,7 @@ public class IngestionJob {
 
   private String insurerId;
   private String filePath;
+  private String fileType; // "normal" or "correction"
 
   @Indexed
   private IngestionStatus status;
@@ -31,16 +35,18 @@ public class IngestionJob {
   @Indexed
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
+  private List<Map<String, String>> verificationFailures = new ArrayList<>();
 
   public IngestionJob() {
   }
 
-  public IngestionJob(String jobId, String insurerId, String filePath, IngestionStatus status,
+  public IngestionJob(String jobId, String insurerId, String filePath, String fileType, IngestionStatus status,
       int totalRecords, int processedRecords, String uploadedBy, String failureReason,
       LocalDateTime createdAt, LocalDateTime updatedAt) {
     this.jobId = jobId;
     this.insurerId = insurerId;
     this.filePath = filePath;
+    this.fileType = fileType;
     this.status = status;
     this.totalRecords = totalRecords;
     this.processedRecords = processedRecords;
@@ -72,6 +78,14 @@ public class IngestionJob {
 
   public void setFilePath(String filePath) {
     this.filePath = filePath;
+  }
+
+  public String getFileType() {
+    return fileType;
+  }
+
+  public void setFileType(String fileType) {
+    this.fileType = fileType;
   }
 
   public IngestionStatus getStatus() {
@@ -128,5 +142,13 @@ public class IngestionJob {
 
   public void setUpdatedAt(LocalDateTime updatedAt) {
     this.updatedAt = updatedAt;
+  }
+
+  public List<Map<String, String>> getVerificationFailures() {
+    return verificationFailures;
+  }
+
+  public void setVerificationFailures(List<Map<String, String>> verificationFailures) {
+    this.verificationFailures = verificationFailures != null ? verificationFailures : new ArrayList<>();
   }
 }

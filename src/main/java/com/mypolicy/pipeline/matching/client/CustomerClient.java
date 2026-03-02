@@ -19,4 +19,10 @@ public interface CustomerClient {
 
   @GetMapping("/api/v1/customers/search/mobile/{mobile}")
   Optional<CustomerDTO> searchByMobile(@PathVariable("mobile") String mobile);
+
+  @GetMapping("/api/v1/customers/search/email/{email}")
+  Optional<CustomerDTO> searchByEmail(@PathVariable("email") String email);
+
+  @GetMapping("/api/v1/customers/search/pan/{pan}")
+  Optional<CustomerDTO> searchByPan(@PathVariable("pan") String pan);
 }

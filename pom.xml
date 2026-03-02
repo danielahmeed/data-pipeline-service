@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.12</version>
+		<version>3.1.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.mypolicy</groupId>
@@ -16,7 +16,7 @@
 	
 	<properties>
 		<java.version>17</java.version>
-		<spring-cloud.version>2023.0.3</spring-cloud.version>
+		<spring-cloud.version>2022.0.4</spring-cloud.version>
 	</properties>
 	
 	<dependencies>
@@ -74,14 +74,20 @@
 		<!-- Hibernate Types for JSONB Support -->
 		<dependency>
 			<groupId>io.hypersistence</groupId>
-			<artifactId>hypersistence-utils-hibernate-63</artifactId>
-			<version>3.7.7</version>
+			<artifactId>hypersistence-utils-hibernate-60</artifactId>
+			<version>3.5.2</version>
 		</dependency>
 		
 		<!-- Jackson for JSON Processing -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
+		</dependency>
+
+		<!-- YAML for metadata config (Spring Boot BOM includes snakeyaml) -->
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
 		</dependency>
 		
 		<!-- Lombok -->
