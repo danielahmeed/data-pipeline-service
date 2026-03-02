@@ -2,21 +2,14 @@ package com.mypolicy.pipeline.matching.dto;
 
 import lombok.Data;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
-/**
- * Policy DTO for communication with Policy Service (external, port 8085).
- */
 @Data
 public class PolicyDTO {
-  private String customerId;
-  private String insurerId;
-  private String policyNumber;
-  private String policyType;
-  private String planName;
-  private BigDecimal premiumAmount;
-  private BigDecimal sumAssured;
-  private LocalDate startDate;
-  private LocalDate endDate;
-  private String status;
+    private String policyNumber;
+    private String customerId;    // THE STITCH: The link to the Master Customer
+    private String insurerId;
+    private String policyType;
+    private BigDecimal premiumAmount;
+    private String expiryDate;
+    private String status;        // Usually set to "ACTIVE" or "STITCHED"
 }
